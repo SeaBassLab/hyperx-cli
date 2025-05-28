@@ -46,7 +46,7 @@ changelog:
 release:
   github:
     owner: SeaBassLab
-    name: hyperx
+    name: hyperx-cli
   footer: |
     ---
     Released by [GoReleaser](https://github.com/goreleaser/goreleaser)
