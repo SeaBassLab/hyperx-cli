@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-const templateRepoURL = "https://github.com/hyperxjs/hyperx-template.git"
+const templateRepoURL = "https://github.com/SeaBassLab/hyperx-template.git"
 
 func Run() {
 	printLogo()
