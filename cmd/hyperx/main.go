@@ -1,36 +1,51 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"os/exec"
 
-	"github.com/hyperx/packages/cli/cmd/internal/builder"
 	"github.com/hyperx/packages/cli/cmd/internal/create"
 )
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("Usá: hyperx [dev|build|start]")
+		fmt.Println("Usá: hyperx [dev|start|create] [--port=XXXX]")
 		os.Exit(1)
 	}
 
+	// Flags compartidas
+	portFlag := flag.String("port", "", "Puerto en el que correr la app")
+
+	// Parse solo los flags, sin consumir el primer arg (comando)
+	flag.CommandLine.Parse(os.Args[2:])
+
 	switch os.Args[1] {
 	case "dev":
-		runDev()
-	case "build":
-		builder.RunBuild()
+		runDev(*portFlag)
 	case "start":
-		runStart()
+		runStart(*portFlag)
 	case "create":
 		create.Run()
 	default:
 		fmt.Println("Comando no reconocido. Usá: hyperx [dev|build]")
 	}
 }
+func setDefaultEnv(key, value string) {
+	if os.Getenv(key) == "" {
+		os.Setenv(key, value)
+	}
+}
 
-func runDev() {
-	os.Setenv("HYPERX_ENV", "dev")
+func runDev(port string) {
+	setDefaultEnv("HYPERX_ENV", "dev")
+
+	if port != "" {
+		os.Setenv("PORT", port)
+	} else {
+		setDefaultEnv("PORT", "4001") // default si no se pasa
+	}
 
 	cmd := exec.Command("air")
 	cmd.Stdout = os.Stdout
@@ -44,8 +59,14 @@ func runDev() {
 	}
 }
 
-func runStart() {
+func runStart(port string) {
 	os.Setenv("HYPERX_ENV", "prod")
+
+	if port != "" {
+		os.Setenv("PORT", port)
+	} else {
+		setDefaultEnv("PORT", "4001") // default si no se pasa
+	}
 
 	cmd := exec.Command("go", "run", ".")
 	cmd.Stdout = os.Stdout
